@@ -18,11 +18,26 @@ class CrearPedidoCommand {
 class PruebaController {
 
     def pedidoService
+    def clienteRepositorio1
+    def clienteRepositorio2
+
+    // static final Logger logger = LoggerFactory.getLogger(this)
 
     static allowedMethods = [
         'index': 'GET',
         'pedido': ['GET', 'POST'],
     ]
+
+    def repositorio() {
+        clienteRepositorio1.clientesEspeciales
+        clienteRepositorio2.clientesEspeciales
+
+        render "ok"
+    }
+
+    def listado() {
+        // Pedido.findAllByFechaLimit(fecha, 20)
+    }
 
     def otro() {
     }
@@ -32,7 +47,7 @@ class PruebaController {
         render([a: 1, b: 2, c: [3,1,11]] as grails.converters.JSON)
         // render "metodoGet"
     }
-    
+
     def metodoPost() {
         render "metodoPost"
     }
@@ -52,11 +67,11 @@ class PruebaController {
 
         render "registrandome ${cliente}"
     }
-    
+
     def listadoClientes() {
         [clientes: Cliente.list()]
     }
-    
+
     def pedido() {
         [
             clientes: Cliente.list(),
@@ -65,6 +80,8 @@ class PruebaController {
     }
 
     def crearPedido(CrearPedidoCommand cmd) {
+        // logger.trace("creando pedido con ${cmd.clienteId}")
+
         if (!cmd.hasErrors()) {
             Pedido p = pedidoService.crearPedido(cmd.clienteId, cmd.articuloId, cmd.cantidad)
             redirect action: 'pedidoCreadoBien', id: p.id
@@ -83,7 +100,15 @@ class PruebaController {
             render(status: 404, view: '/notFound')
         }
     }
-    
+
+    def verCliente(Long id) {
+        Cliente cliente = Cliente.get(id)
+        "${cliente}"
+        "${cliente.id}"
+        "${cliente.pedidos}" // lazy vs eager
+        render ""
+    }
+
     def error() {
         throw new IllegalArgumentException()
     }

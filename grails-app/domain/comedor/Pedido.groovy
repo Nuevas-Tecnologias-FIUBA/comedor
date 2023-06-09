@@ -2,21 +2,24 @@ package comedor
 
 import java.time.LocalDateTime
 
-
 class Pedido {
 
     Cliente cliente
     Articulo articulo
-    
-    int cantidadDeArticulos
+
     BigDecimal precioTotal
 
     LocalDateTime momentoCreacion
     LocalDateTime momentoEntrega
 
+    Set<ItemDePedido> items = []
+
+    static hasMany = [
+        items: ItemDePedido,
+    ]
+
     static constraints = {
         cliente nullable: false
-        articulo nullable: false
         precioTotal nullable: false
         momentoCreacion nullable: false
         momentoEntrega nullable: true
@@ -26,8 +29,9 @@ class Pedido {
         assert cliente != null
         assert articulo != null
         assert cantidadDeArticulos >= 1
-        assert articulo.stock >= cantidadDeArticulos
-        
+        if (articulo.stock < 0) throw new RuntimeException()
+        if (articulo.stock < cantidadDeArticulos) throw new SinStockException()
+
         this.cliente = cliente
         this.articulo = articulo
         this.cantidadDeArticulos = cantidadDeArticulos
